@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .d-flex {
+      display: flex;
+      justify-content: space-between;
+    }
+    .card {
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card img {
+      border-bottom: 3px solid #007bff;
+      border-radius: 0;
+      max-height: 200px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 15px;
+    }
+    .btn {
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      margin: 5px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .alert {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    
+    <div class="d-flex justify-content-between mb-3">
+      <a href="/candidates" class="btn btn-secondary">Candidate Page</a>
+    </div>
+
+    <h2>Upload Candidate</h2>
+    <form action="/admin/upload" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="candidateName">Candidate Name</label>
+        <input type="text" id="candidateName" name="candidateName" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="candidatePosition">Position</label>
+        <input type="text" id="candidatePosition" name="candidatePosition" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="candidateImage">Candidate Image</label>
+        <input type="file" id="candidateImage" name="candidateImage" class="form-control-file" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Upload</button>
+    </form>
+
+    <h2 class="mt-5">Current Candidates</h2>
+    <div class="row">
+      <% candidates.forEach((candidate, index) => { %>
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="/uploads/<%= candidate.image %>" class="card-img-top" alt="<%= candidate.name %>">
+            <div class="card-body text-center">
+              <h5 class="card-title"><%= candidate.name %> - <%= candidate.position %></h5>
+              <form action="/admin/delete-candidate" method="post" class="d-inline">
+                <input type="hidden" name="index" value="<%= index %>">
+                <button type="submit" class="btn btn-danger btn-block">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <h2 class="mt-5">Vote Counts</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Candidate Name</th>
+          <th>Position</th>
+          <th>Yes Votes</th>
+          <th>No Votes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% candidates.forEach(candidate => { %>
+          <tr>
+            <td><%= candidate.name %></td>
+            <td><%= candidate.position %></td>
+            <td><%= voteCount[candidate.name]?.yes || 0 %></td>
+            <td><%= voteCount[candidate.name]?.no || 0 %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <a href="/change-password" class="btn btn-warning mt-4">Reset Password</a>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

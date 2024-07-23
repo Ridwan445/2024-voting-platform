@@ -1,0 +1,34 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.container {
+  max-width: 800px;
+}
+
+.card {
+  margin: auto;
+  margin-top: 20px;
+}
+
+.card-title {
+  margin-bottom: 30px;
+}
+
+.card-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+.candidate {
+  margin-bottom: 20px;
+}
+
+.candidate img {
+  max-width: 100%;
+  height: auto;
+}
+
+.candidate button {
+  margin-top: 10px;
+}
