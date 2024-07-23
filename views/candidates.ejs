@@ -77,7 +77,7 @@
           <p class="text-center">No candidates available.</p>
         </div>
       <% } else { %>
-        <% candidates.forEach(candidate => { %>
+        <% candidates.forEach((candidate, index) => { %>
           <div class="col-md-4">
             <div class="card">
               <img src="/uploads/<%= candidate.image %>" class="card-img-top" alt="<%= candidate.name %>">
@@ -85,6 +85,7 @@
                 <h5 class="card-title"><%= candidate.name %> - <%= candidate.position %></h5>
                 <form action="/vote" method="post">
                   <input type="hidden" name="candidateName" value="<%= candidate.name %>">
+                  <input type="hidden" name="candidateIndex" value="<%= index %>">
                   <button type="submit" name="vote" value="yes" class="btn btn-success">Yes</button>
                   <button type="submit" name="vote" value="no" class="btn btn-danger">No</button>
                 </form>
