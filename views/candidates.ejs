@@ -1,104 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/css/styles.css">
-  <title>Candidates</title>
-  <style>
-    body {
-      background-color: #f0f8ff;
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-    }
-    .card {
-      margin-bottom: 20px;
-      border: none;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    .card img {
-      border-bottom: 3px solid #007bff;
-      border-radius: 0;
-      max-height: 200px;
-      object-fit: cover;
-    }
-    .card-body {
-      padding: 15px;
-    }
-    .btn {
-      border-radius: 20px;
-      padding: 10px 20px;
-      font-size: 14px;
-      margin: 5px;
-    }
-    h1, h2 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 20px;
-    }
-    .alert {
-      margin-bottom: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidates</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .candidate {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .candidate img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        .candidate-details {
+            flex: 1;
+        }
+        .radio-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .no-candidates {
+            text-align: center;
+            margin: 50px 0;
+        }
+    </style>
 </head>
 <body>
-  <h1>Degun Mitros estate Laderin Abeokuta Online-Voting Platform</h1>
-  <div class="container">
-    <h2>Cast Your Vote</h2>
-
-    <% if (typeof message !== 'undefined' && message) { %>
-      <div class="alert <%= alertClass || 'alert-info' %> alert-dismissible fade show" role="alert">
-        <strong><%= message %></strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    <% } %>
-
-    <div class="row">
-      <% if (candidates.length === 0) { %>
-        <div class="col-12">
-          <p class="text-center">No candidates available.</p>
-        </div>
-      <% } else { %>
-        <% candidates.forEach((candidate, index) => { %>
-          <div class="col-md-4">
-            <div class="card">
-              <img src="/uploads/<%= candidate.image %>" class="card-img-top" alt="<%= candidate.name %>">
-              <div class="card-body text-center">
-                <h5 class="card-title"><%= candidate.name %> - <%= candidate.position %></h5>
-                <form action="/vote" method="post">
-                  <input type="hidden" name="candidateName" value="<%= candidate.name %>">
-                  <input type="hidden" name="candidateIndex" value="<%= index %>">
-                  <button type="submit" name="vote" value="yes" class="btn btn-success">Yes</button>
-                  <button type="submit" name="vote" value="no" class="btn btn-danger">No</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
+    <div class="container">
+        <h1>Candidates</h1>
+        <% if (candidates.length === 0) { %>
+            <p class="no-candidates">No candidates available</p>
+        <% } else { %>
+            <form action="/vote" method="POST" id="voteForm">
+                <% candidates.forEach((candidate, index) => { %>
+                    <div class="candidate">
+                        <img src="/uploads/<%= candidate.image %>" alt="<%= candidate.name %>">
+                        <div class="candidate-details">
+                            <h2><%= candidate.name %></h2>
+                            <p>Position: <%= candidate.position %></p>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="vote<%= index %>" value="yes" required> Yes
+                                </label>
+                                <label>
+                                    <input type="radio" name="vote<%= index %>" value="no" required> No
+                                </label>
+                            </div>
+                            <input type="hidden" name="candidateName<%= index %>" value="<%= candidate.name %>">
+                        </div>
+                    </div>
+                <% }); %>
+                <button type="submit" class="btn">Submit Vote</button>
+            </form>
+        <% } %>
     </div>
-  </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('voteForm').addEventListener('submit', function(e) {
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            if (radios.length < <%= candidates.length %>) {
+                e.preventDefault();
+                alert('Please vote for all candidates.');
+            }
+        });
+    </script>
 </body>
 </html>

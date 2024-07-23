@@ -5,8 +5,6 @@ const session = require('express-session');
 const multer = require('multer');
 const fs = require('fs');
 
-
-
 const allowedFlatNumbers = [
   'A1A', 'A1B', 'A2A', 'A2B', 'A3A', 'A3B', 'B1B', 
   'B2A', 'B2B', 'B3A', 'B3B', 'B4A', 'B4B', 'C1A', 
@@ -17,7 +15,7 @@ const allowedFlatNumbers = [
   'F3B', 'F4A', 'F4B', 'G1A', 'G1B', 'G2A', 'G2B', 
   'G3A', 'G3B', 'H1A', 'H1B', 'H2A', 'H2B', 'H3A', 
   'H3B', 'I1A', 'I1B', 'I2A', 'I2B', 'I3A', 'I3B', 
-  'J1A', 'J1B', 'J2A', 'J2B', 'J3A', 'J3B', 'K 1A', 
+  'J1A', 'J1B', 'J2A', 'J2B', 'J3A', 'J3B', 'K1A', 
   'K1B', 'K2A', 'K2B', 'K3A', 'K3B', 'L1A', 'L1B', 
   'L2A', 'L2B', 'L3A', 'L3B', 'M1A', 'M1B', 'M2A', 
   'M2B', 'M3A', 'M3B', 'M4A', 'M4B', 'M5A', 'M5B', 
@@ -101,67 +99,64 @@ app.get('/candidates', (req, res) => {
 });
 
 app.post('/vote', (req, res) => {
-  const { candidateName, vote } = req.body;
   const flatNumber = req.session.flatNumber;
-  const email = req.session.email; 
-
-  console.log('Vote Received:', { candidateName, vote, flatNumber });
 
   if (!flatNumber) {
-    return res.redirect('/');
+      return res.redirect('/');
   }
 
   if (!votes[flatNumber]) votes[flatNumber] = 0;
 
   if (votes[flatNumber] < 2) {
-    votes[flatNumber]++;
-    if (candidateName) {
-      if (!voteCount[candidateName]) {
-        voteCount[candidateName] = { yes: 0, no: 0 };
-      }
-      if (vote === 'yes') {
-        voteCount[candidateName].yes++;
-      } else if (vote === 'no') {
-        voteCount[candidateName].no++;
-      }
-    }
+      votes[flatNumber]++;
 
-    console.log('Updated Vote Count:', voteCount);
-    saveData();
-    res.redirect('/thankyou');
+      candidates.forEach((candidate, index) => {
+          const vote = req.body[`vote${index}`];
+          const candidateName = req.body[`candidateName${index}`];
+
+          if (candidateName && (vote === 'yes' || vote === 'no')) {
+              if (!voteCount[candidateName]) {
+                  voteCount[candidateName] = { yes: 0, no: 0 };
+              }
+              voteCount[candidateName][vote]++;
+          }
+      });
+
+      console.log('Updated Vote Count:', voteCount);
+      saveData();
+      res.redirect('/thankyou');
   } else {
-    res.render('candidates', {
-      candidates,
-      flatNumber,
-      message: 'You have reached the maximum number of votes.',
-      alertClass: 'alert-warning'
-    });
+      res.render('candidates', {
+          candidates,
+          flatNumber,
+          message: 'You have reached the maximum number of votes.',
+          alertClass: 'alert-warning'
+      });
   }
 });
 
-const loadData = () => {
-  const dataPath = path.join(__dirname, 'voteData.json');
-  if (fs.existsSync(dataPath)) {
-    const rawData = fs.readFileSync(dataPath, 'utf-8');
-    voteCount = JSON.parse(rawData);
-  }
+
+  const loadData = () => {
+    const dataPath = path.join(__dirname, 'voteData.json');
+    if (fs.existsSync(dataPath)) {
+        const rawData = fs.readFileSync(dataPath, 'utf-8');
+        voteCount = JSON.parse(rawData);
+    }
 };
 
 const saveData = () => {
-  const dataPath = path.join(__dirname, 'voteData.json');
-  fs.writeFileSync(dataPath, JSON.stringify(voteCount, null, 2), 'utf-8');
+    const dataPath = path.join(__dirname, 'voteData.json');
+    fs.writeFileSync(dataPath, JSON.stringify(voteCount, null, 2), 'utf-8');
 };
+
 
 app.get("/thankyou", (req, res) => {
   res.render("thankyou")
-})
-
-
+});
 
 app.get('/admin-login', (req, res) => {
   res.render('admin-login', { message: null, alertClass: null });
 });
-
 
 app.post('/admin-login', (req, res) => {
   const { password } = req.body;
@@ -185,7 +180,6 @@ const ensureAdmin = (req, res, next) => {
 };
 
 app.get('/admin', ensureAdmin, (req, res) => {
-  console.log('Vote Count:', voteCount); 
   loadData();
   res.render('admin', { candidates, voteCount });
 });
@@ -221,8 +215,9 @@ app.post('/admin/delete-candidate', ensureAdmin, (req, res) => {
     });
     delete voteCount[candidate.name];
   }
-  res.redirect('/admin');
+  res.render('admin', { candidates, voteCount });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

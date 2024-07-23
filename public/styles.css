@@ -3,32 +3,52 @@ body {
 }
 
 .container {
-  max-width: 800px;
+  margin-top: 50px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-  margin: auto;
-  margin-top: 20px;
-}
-
-.card-title {
+h1 {
+  color: #007bff;
   margin-bottom: 30px;
 }
 
-.card-body img {
-  max-width: 100%;
-  height: auto;
+.candidate {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background-color: #e9ecef;
 }
 
-.candidate {
-  margin-bottom: 20px;
+.candidate h3 {
+  margin: 0;
+  flex: 1;
+  color: #343a40;
 }
 
 .candidate img {
-  max-width: 100%;
-  height: auto;
+  margin-right: 20px;
+  border-radius: 5px;
 }
 
-.candidate button {
-  margin-top: 10px;
+.form-check {
+  margin-left: 20px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.alert {
+  margin-bottom: 20px;
 }
