@@ -62,6 +62,32 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+const loadCandidates = () => {
+  const candidatesPath = path.join(__dirname, 'candidates.json');
+  if (fs.existsSync(candidatesPath)) {
+    const rawData = fs.readFileSync(candidatesPath, 'utf-8');
+    candidates = JSON.parse(rawData);
+  }
+};
+
+const saveCandidates = () => {
+  const candidatesPath = path.join(__dirname, 'candidates.json');
+  fs.writeFileSync(candidatesPath, JSON.stringify(candidates, null, 2), 'utf-8');
+};
+
+const loadData = () => {
+  const dataPath = path.join(__dirname, 'voteData.json');
+  if (fs.existsSync(dataPath)) {
+    const rawData = fs.readFileSync(dataPath, 'utf-8');
+    voteCount = JSON.parse(rawData);
+  }
+};
+
+const saveData = () => {
+  const dataPath = path.join(__dirname, 'voteData.json');
+  fs.writeFileSync(dataPath, JSON.stringify(voteCount, null, 2), 'utf-8');
+};
+
 app.get('/', (req, res) => {
   res.render('index', { message: null, alertClass: null });
 });
@@ -102,56 +128,41 @@ app.post('/vote', (req, res) => {
   const flatNumber = req.session.flatNumber;
 
   if (!flatNumber) {
-      return res.redirect('/');
+    return res.redirect('/');
   }
 
   if (!votes[flatNumber]) votes[flatNumber] = 0;
 
   if (votes[flatNumber] < 2) {
-      votes[flatNumber]++;
+    votes[flatNumber]++;
 
-      candidates.forEach((candidate, index) => {
-          const vote = req.body[`vote${index}`];
-          const candidateName = req.body[`candidateName${index}`];
+    candidates.forEach((candidate, index) => {
+      const vote = req.body[`vote${index}`];
+      const candidateName = req.body[`candidateName${index}`];
 
-          if (candidateName && (vote === 'yes' || vote === 'no')) {
-              if (!voteCount[candidateName]) {
-                  voteCount[candidateName] = { yes: 0, no: 0 };
-              }
-              voteCount[candidateName][vote]++;
-          }
-      });
+      if (candidateName && (vote === 'yes' || vote === 'no')) {
+        if (!voteCount[candidateName]) {
+          voteCount[candidateName] = { yes: 0, no: 0 };
+        }
+        voteCount[candidateName][vote]++;
+      }
+    });
 
-      console.log('Updated Vote Count:', voteCount);
-      saveData();
-      res.redirect('/thankyou');
+    console.log('Updated Vote Count:', voteCount);
+    saveData();
+    res.redirect('/thankyou');
   } else {
-      res.render('candidates', {
-          candidates,
-          flatNumber,
-          message: 'You have reached the maximum number of votes.',
-          alertClass: 'alert-warning'
-      });
+    res.render('candidates', {
+      candidates,
+      flatNumber,
+      message: 'You have reached the maximum number of votes.',
+      alertClass: 'alert-warning'
+    });
   }
 });
 
-
-  const loadData = () => {
-    const dataPath = path.join(__dirname, 'voteData.json');
-    if (fs.existsSync(dataPath)) {
-        const rawData = fs.readFileSync(dataPath, 'utf-8');
-        voteCount = JSON.parse(rawData);
-    }
-};
-
-const saveData = () => {
-    const dataPath = path.join(__dirname, 'voteData.json');
-    fs.writeFileSync(dataPath, JSON.stringify(voteCount, null, 2), 'utf-8');
-};
-
-
-app.get("/thankyou", (req, res) => {
-  res.render("thankyou")
+app.get('/thankyou', (req, res) => {
+  res.render('thankyou');
 });
 
 app.get('/admin-login', (req, res) => {
@@ -180,6 +191,7 @@ const ensureAdmin = (req, res, next) => {
 };
 
 app.get('/admin', ensureAdmin, (req, res) => {
+  loadCandidates();
   loadData();
   res.render('admin', { candidates, voteCount });
 });
@@ -200,6 +212,7 @@ app.post('/admin/upload', ensureAdmin, upload.single('candidateImage'), (req, re
   const candidateImage = req.file.filename;
   candidates.push({ name: candidateName, position: candidatePosition, image: candidateImage });
   voteCount[candidateName] = { yes: 0, no: 0 };
+  saveCandidates();
   res.redirect('/admin');
 });
 
@@ -214,10 +227,15 @@ app.post('/admin/delete-candidate', ensureAdmin, (req, res) => {
       }
     });
     delete voteCount[candidate.name];
+    saveCandidates();
+    saveData();
   }
   res.render('admin', { candidates, voteCount });
 });
 
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  loadCandidates();
+  loadData();
+  console.log(`Server started on port ${PORT}`);
+});
