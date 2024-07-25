@@ -136,6 +136,11 @@ app.post('/vote', (req, res) => {
   if (votes[flatNumber] < 2) {
     votes[flatNumber]++;
 
+    if (!voteCount[flatNumber]) {
+      voteCount[flatNumber] = 0;
+    }
+    voteCount[flatNumber]++;
+
     candidates.forEach((candidate, index) => {
       const vote = req.body[`vote${index}`];
       const candidateName = req.body[`candidateName${index}`];
