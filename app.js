@@ -6,27 +6,27 @@ const multer = require('multer');
 const fs = require('fs');
 
 const allowedFlatNumbers = [
-  'A1A', 'A1B', 'A2A', 'A2B', 'A3A', 'A3B', 'B1B', 
-  'B2A', 'B2B', 'B3A', 'B3B', 'B4A', 'B4B', 'C1A', 
-  'C1B', 'C2A', 'C2B', 'C3A', 'C3B', 'C4A', 'C4B', 
-  'D1A', 'D1B', 'D2A', 'D2B', 'D3A', 'D3B', 'D4A', 
-  'D4B', 'E1A', 'E1B', 'E2A', 'E2B', 'E3A', 'E3B', 
-  'E4A', 'E4B', 'F1A', 'F1B', 'F2A', 'F2B', 'F3A', 
-  'F3B', 'F4A', 'F4B', 'G1A', 'G1B', 'G2A', 'G2B', 
-  'G3A', 'G3B', 'H1A', 'H1B', 'H2A', 'H2B', 'H3A', 
-  'H3B', 'I1A', 'I1B', 'I2A', 'I2B', 'I3A', 'I3B', 
-  'J1A', 'J1B', 'J2A', 'J2B', 'J3A', 'J3B', 'K1A', 
-  'K1B', 'K2A', 'K2B', 'K3A', 'K3B', 'L1A', 'L1B', 
-  'L2A', 'L2B', 'L3A', 'L3B', 'M1A', 'M1B', 'M2A', 
-  'M2B', 'M3A', 'M3B', 'M4A', 'M4B', 'M5A', 'M5B', 
-  'N1A', 'N1B', 'N2A', 'N2B', 'N3A', 'N3B', 'N4A', 
-  'N4B', 'N5A', 'N5B', 'O1', 'O2', 'O3', 'O4', 'O5', 
-  'O6', 'O7', 'O8', 'O9', 'O10', 'O11', 'O12', 'O13', 
-  'O14', 'O15', 'O16', 'P1', 'P2', 'P3', 'P4', 'P5', 
-  'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 
-  'P14', 'P15', 'P16', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 
-  'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 
-  'Q14', 'Q15', 'Q16', 'R1A', 'R1B', 'R2A', 'R2B', 
+  'A1A', 'A1B', 'A2A', 'A2B', 'A3A', 'A3B', 'B1B',
+  'B2A', 'B2B', 'B3A', 'B3B', 'B4A', 'B4B', 'C1A',
+  'C1B', 'C2A', 'C2B', 'C3A', 'C3B', 'C4A', 'C4B',
+  'D1A', 'D1B', 'D2A', 'D2B', 'D3A', 'D3B', 'D4A',
+  'D4B', 'E1A', 'E1B', 'E2A', 'E2B', 'E3A', 'E3B',
+  'E4A', 'E4B', 'F1A', 'F1B', 'F2A', 'F2B', 'F3A',
+  'F3B', 'F4A', 'F4B', 'G1A', 'G1B', 'G2A', 'G2B',
+  'G3A', 'G3B', 'H1A', 'H1B', 'H2A', 'H2B', 'H3A',
+  'H3B', 'I1A', 'I1B', 'I2A', 'I2B', 'I3A', 'I3B',
+  'J1A', 'J1B', 'J2A', 'J2B', 'J3A', 'J3B', 'K1A',
+  'K1B', 'K2A', 'K2B', 'K3A', 'K3B', 'L1A', 'L1B',
+  'L2A', 'L2B', 'L3A', 'L3B', 'M1A', 'M1B', 'M2A',
+  'M2B', 'M3A', 'M3B', 'M4A', 'M4B', 'M5A', 'M5B',
+  'N1A', 'N1B', 'N2A', 'N2B', 'N3A', 'N3B', 'N4A',
+  'N4B', 'N5A', 'N5B', 'O1', 'O2', 'O3', 'O4', 'O5',
+  'O6', 'O7', 'O8', 'O9', 'O10', 'O11', 'O12', 'O13',
+  'O14', 'O15', 'O16', 'P1', 'P2', 'P3', 'P4', 'P5',
+  'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13',
+  'P14', 'P15', 'P16', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5',
+  'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13',
+  'Q14', 'Q15', 'Q16', 'R1A', 'R1B', 'R2A', 'R2B',
   'R3A', 'R3B', 'R4A', 'R4B', 'R5A', 'R5B'
 ];
 
@@ -88,6 +88,25 @@ const saveData = () => {
   fs.writeFileSync(dataPath, JSON.stringify(voteCount, null, 2), 'utf-8');
 };
 
+const deleteOldCandidates = () => {
+  const now = Date.now();
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  candidates = candidates.filter(candidate => {
+    const candidateAge = now - new Date(candidate.timestamp).getTime();
+    if (candidateAge > twentyFourHours) {
+      const imagePath = path.join(__dirname, 'public', 'uploads', candidate.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+      return false;
+    }
+    return true;
+  });
+  saveCandidates();
+};
+
+setInterval(deleteOldCandidates, 60 * 60 * 1000); // Check every hour
+
 app.get('/', (req, res) => {
   res.render('index', { message: null, alertClass: null });
 });
@@ -108,15 +127,15 @@ app.get('/candidates', (req, res) => {
     return res.redirect('/');
   }
   if (!votes[flatNumber] || votes[flatNumber] < 2) {
-    res.render('candidates', { 
-      flatNumber, 
+    res.render('candidates', {
+      flatNumber,
       candidates,
-      message: null, 
-      alertClass: null 
+      message: null,
+      alertClass: null
     });
   } else {
-    res.render('candidates', { 
-      flatNumber, 
+    res.render('candidates', {
+      flatNumber,
       candidates,
       message: 'You have reached the maximum number of votes.',
       alertClass: 'alert-danger'
@@ -180,10 +199,10 @@ app.post('/admin-login', (req, res) => {
     req.session.isAdmin = true;
     res.redirect('/admin');
   } else {
-    res.render('admin-login', { 
+    res.render('admin-login', {
       message: 'Incorrect password.',
-      alertClass: 'alert-danger' 
-    }); 
+      alertClass: 'alert-danger'
+    });
   }
 });
 
@@ -215,7 +234,8 @@ app.post('/admin/upload', ensureAdmin, upload.single('candidateImage'), (req, re
   const candidateName = req.body.candidateName;
   const candidatePosition = req.body.candidatePosition;
   const candidateImage = req.file.filename;
-  candidates.push({ name: candidateName, position: candidatePosition, image: candidateImage });
+  const timestamp = new Date().toISOString();
+  candidates.push({ name: candidateName, position: candidatePosition, image: candidateImage, timestamp: timestamp });
   voteCount[candidateName] = { yes: 0, no: 0 };
   saveCandidates();
   res.redirect('/admin');
